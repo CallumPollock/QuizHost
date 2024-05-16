@@ -1,5 +1,7 @@
-public class Player 
+using Unity.Collections;
+
+public struct Player 
 {
-    string name;
-    int score;
+    public FixedString32Bytes name;
+    public int score;
 }

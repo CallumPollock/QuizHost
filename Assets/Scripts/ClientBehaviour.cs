@@ -1,28 +1,52 @@
 using UnityEngine;
 using Unity.Networking.Transport;
+using Unity.Collections;
+using System;
+using UnityEngine.SceneManagement;
 
 public class ClientBehaviour : MonoBehaviour
 {
     NetworkDriver m_Driver;
     NetworkConnection m_Connection;
 
-    string m_Name;
-    string m_ip;
+    Player player;
+
+    string m_ip = "127.0.0.1";
+    public static Action<FixedString128Bytes> messageReceived;
+
+    KeyboardHandler m_KeyboardHandler;
 
     public void UpdateName(string _name)
     {
-        m_Name = _name;
+        player.name = _name;
     }
     public void UpdateIP(string _ip)
     {
         m_ip = _ip;
     }
+    
 
     void Start()
     {
         m_Driver = NetworkDriver.Create();
-
+        DontDestroyOnLoad(this);
+        SceneManager.sceneLoaded += OnSceneLoaded;
         
+        
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        m_KeyboardHandler = FindAnyObjectByType<KeyboardHandler>();
+        //m_KeyboardHandler.OnKeyPress += SendMessageToServer;
+    }
+
+    public void SendMessageToServer(NetworkMessage netMsg)
+    {
+        DataStreamWriter writer;
+        m_Driver.BeginSend(m_Connection, out writer);
+        netMsg.Serialize(ref writer);
+        m_Driver.EndSend(writer);
     }
 
     public void ConnectToServer()
@@ -55,18 +79,14 @@ public class ClientBehaviour : MonoBehaviour
             {
                 Debug.Log("We are now connected to the server.");
 
-                //uint value = 1;
-                m_Driver.BeginSend(m_Connection, out var writer);
-                writer.WriteFixedString32(m_Name);
-                m_Driver.EndSend(writer);
+                Net_ClientConnection clientConnection = new Net_ClientConnection(true, player);
+                SendMessageToServer(clientConnection);
             }
             else if (cmd == NetworkEvent.Type.Data)
             {
-                uint value = stream.ReadUInt();
-                Debug.Log($"Got the value {value} back from the server.");
-
-                m_Connection.Disconnect(m_Driver);
-                m_Connection = default;
+                FixedString128Bytes msg = stream.ReadFixedString128();
+                Debug.Log($"Got the message {msg} back from the server.");
+                messageReceived?.Invoke(msg);
             }
             else if (cmd == NetworkEvent.Type.Disconnect)
             {

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Collections;
 using Unity.Networking.Transport;
+using System.Net;
 
 public class ServerBehaviour : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class ServerBehaviour : MonoBehaviour
     NetworkDriver m_Driver;
     NativeList<NetworkConnection> m_Connections;
 
-    void Start()
+    public void StartServer()
     {
         m_Driver = NetworkDriver.Create();
         m_Connections = new NativeList<NetworkConnection>(16, Allocator.Persistent);
@@ -20,8 +21,9 @@ public class ServerBehaviour : MonoBehaviour
             return;
         }
         m_Driver.Listen();
-    }
 
+        Debug.Log(string.Format("Started server on {0}", Dns.GetHostName()));
+    }
 
     void OnDestroy()
     {
@@ -32,8 +34,27 @@ public class ServerBehaviour : MonoBehaviour
         }
     }
 
+    public void SendMessageToClients(string _msg)
+    {
+        for (int i = 0; i < m_Connections.Length; i++)
+        {
+            MessageClient(m_Connections[i], _msg);
+        }
+    }
+
+    void MessageClient(NetworkConnection client, string _msg)
+    {
+        DataStreamWriter writer;
+
+        m_Driver.BeginSend(client, out writer);
+        writer.WriteFixedString128(_msg);
+        m_Driver.EndSend(writer);
+    }
+
     void Update()
     {
+        if(!m_Driver.IsCreated) { return; }
+
         m_Driver.ScheduleUpdate().Complete();
 
         // Clean up connections.
@@ -52,6 +73,7 @@ public class ServerBehaviour : MonoBehaviour
         {
             m_Connections.Add(c);
             Debug.Log("Accepted a connection.");
+            MessageClient(c, "Lobby");
         }
 
         for (int i = 0; i < m_Connections.Length; i++)
