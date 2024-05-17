@@ -36,7 +36,12 @@ public class ServerBehaviour : MonoBehaviour
         }
     }
 
-    public void SendMessageToClients(string _msg)
+    public void SendClientsToScene(string scene)
+    {
+        SendMessageToAllClients(new Net_LoadSceneMessage((Scenes)Enum.Parse(typeof(Scenes), scene)));
+    }
+
+    void SendMessageToAllClients(NetworkMessage _msg)
     {
         for (int i = 0; i < m_Connections.Length; i++)
         {
@@ -44,12 +49,12 @@ public class ServerBehaviour : MonoBehaviour
         }
     }
 
-    void MessageClient(NetworkConnection client, string _msg)
+    void MessageClient(NetworkConnection client, NetworkMessage _msg)
     {
         DataStreamWriter writer;
 
         m_Driver.BeginSend(client, out writer);
-        writer.WriteFixedString128(_msg);
+        _msg.Serialize(ref writer);
         m_Driver.EndSend(writer);
     }
 
@@ -75,7 +80,7 @@ public class ServerBehaviour : MonoBehaviour
         {
             m_Connections.Add(c);
             Debug.Log("Accepted a connection.");
-            MessageClient(c, "Lobby");
+            MessageClient(c, new Net_LoadSceneMessage(Scenes.Lobby));
         }
 
         for (int i = 0; i < m_Connections.Length; i++)
@@ -114,7 +119,9 @@ public class ServerBehaviour : MonoBehaviour
 
                         //Client answer
                         case 3:
-                            Debug.Log("Client has answered");
+                            Byte ans = stream.ReadByte();
+                            Debug.Log(String.Format("Client has answered with {0}", ans));
+                            MessageClient(m_Connections[i], new Net_CharAnswer((char)ans));
                             break;
                         //Message not recognised, throw error and ignore
                         default:

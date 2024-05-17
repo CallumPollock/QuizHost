@@ -7,12 +7,12 @@ public class SceneLoader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ClientBehaviour.messageReceived += LoadScene;
+        ClientBehaviour.LoadScene += LoadScene;
     }
 
-    void LoadScene(FixedString128Bytes sceneID)
+    void LoadScene(Scenes _scene)
     {
-        SceneManager.LoadScene(sceneID.ToString());
+        SceneManager.LoadScene((int)_scene);
     }
 
 }

@@ -12,7 +12,7 @@ public class ClientBehaviour : MonoBehaviour
     Player player;
 
     string m_ip = "127.0.0.1";
-    public static Action<FixedString128Bytes> messageReceived;
+    public static Action<Scenes> LoadScene;
 
     KeyboardHandler m_KeyboardHandler;
 
@@ -39,10 +39,15 @@ public class ClientBehaviour : MonoBehaviour
         QRCodeScanner.QRCodeRead += ConnectToServer;
     }
 
+    void CreateAnswerMessage(byte[] ans_bytes)
+    {
+
+    }
+
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         m_KeyboardHandler = FindAnyObjectByType<KeyboardHandler>();
-        //m_KeyboardHandler.OnKeyPress += SendMessageToServer;
+        m_KeyboardHandler.OnKeyPress += SendMessageToServer;
     }
 
     public void SendMessageToServer(NetworkMessage netMsg)
@@ -88,15 +93,38 @@ public class ClientBehaviour : MonoBehaviour
             }
             else if (cmd == NetworkEvent.Type.Data)
             {
-                FixedString128Bytes msg = stream.ReadFixedString128();
-                Debug.Log($"Got the message {msg} back from the server.");
-                messageReceived?.Invoke(msg);
+                byte messageType = stream.ReadByte();
+
+                switch (messageType)
+                {
+                    //Client connection
+                    case 1:
+                        Debug.LogError("This message is for the server, client will ignore it.");
+                        break;
+
+                    //Load scene
+                    case 2:
+                        LoadScene?.Invoke((Scenes)stream.ReadByte());
+                        break;
+
+                    //Client answer
+                    case 3:
+                        Byte ans = stream.ReadByte();
+                        Debug.Log(String.Format("Server has confirmed answer with {0}", ans));
+                        m_KeyboardHandler.ConfirmAnswer(ans);
+                        break;
+                    //Message not recognised, throw error and ignore
+                    default:
+                        Debug.LogError(String.Format("Message type ({0}) not recognised, it has been ignored.", messageType));
+                        break;
+                }
+                
             }
             else if (cmd == NetworkEvent.Type.Disconnect)
             {
                 Debug.Log("Client got disconnected from server.");
                 m_Connection = default;
-                messageReceived?.Invoke("MobileJoin");
+                LoadScene?.Invoke(0);
             }
         }
 

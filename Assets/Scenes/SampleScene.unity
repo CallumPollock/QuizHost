@@ -274,7 +274,7 @@ GameObject:
   - component: {fileID: 262535663}
   - component: {fileID: 262535662}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Send to Keypad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -346,7 +346,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 69367916}
         m_TargetAssemblyTypeName: ServerBehaviour, Assembly-CSharp
-        m_MethodName: SendMessageToClients
+        m_MethodName: SendClientsToScene
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -394,6 +394,70 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 262535660}
   m_CullTransparentMesh: 1
+--- !u!1 &298594015
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 298594016}
+  - component: {fileID: 298594017}
+  m_Layer: 5
+  m_Name: Server Started UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &298594016
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298594015}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 528312833}
+  - {fileID: 342770299}
+  m_Father: {fileID: 929487228}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &298594017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298594015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 2
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &342770298
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,16 +485,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342770298}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 929487228}
+  m_Father: {fileID: 298594016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1696.2, y: -859.8}
+  m_AnchoredPosition: {x: 975, y: -810}
   m_SizeDelta: {x: 447.5507, y: 447.5507}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &342770300
@@ -751,21 +815,20 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 528312832}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1893220738}
   - {fileID: 262535661}
   - {fileID: 2024819869}
   - {fileID: 1117392301}
-  m_Father: {fileID: 929487228}
+  m_Father: {fileID: 298594016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 100}
+  m_SizeDelta: {x: 646.6667, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &528312834
 MonoBehaviour:
@@ -889,8 +952,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1187470279}
-  - {fileID: 528312833}
-  - {fileID: 342770299}
+  - {fileID: 1893220738}
+  - {fileID: 298594016}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1121,6 +1184,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lobbyPlayerPrefab: {fileID: 2988912190739727559, guid: 309578e1666bafb4d98d871a05d92de1, type: 3}
   lobbyTransform: {fileID: 1187470279}
+  serverStartedTools: {fileID: 298594015}
+  startServerButton: {fileID: 1893220737}
 --- !u!1 &1106608859
 GameObject:
   m_ObjectHideFlags: 0
@@ -1268,7 +1333,7 @@ GameObject:
   - component: {fileID: 1117392303}
   - component: {fileID: 1117392302}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Debug Connect as Client
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1597,7 +1662,7 @@ GameObject:
   - component: {fileID: 1893220740}
   - component: {fileID: 1893220739}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Start Server
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1616,7 +1681,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1325750602}
-  m_Father: {fileID: 528312833}
+  m_Father: {fileID: 929487228}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1679,6 +1744,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1055049640}
+        m_TargetAssemblyTypeName: LobbyUI, Assembly-CSharp
+        m_MethodName: ServerStarted
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1893220740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1730,7 +1807,7 @@ GameObject:
   - component: {fileID: 2024819871}
   - component: {fileID: 2024819870}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: Send to Lobby
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1802,7 +1879,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 69367916}
         m_TargetAssemblyTypeName: ServerBehaviour, Assembly-CSharp
-        m_MethodName: SendMessageToClients
+        m_MethodName: SendClientsToScene
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
