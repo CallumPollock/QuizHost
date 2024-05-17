@@ -24,15 +24,19 @@ public class ClientBehaviour : MonoBehaviour
     {
         m_ip = _ip;
     }
-    
+    public void OnClickConnect()
+    {
+        ConnectToServer(m_ip);
+    }
+
 
     void Start()
     {
         m_Driver = NetworkDriver.Create();
         DontDestroyOnLoad(this);
         SceneManager.sceneLoaded += OnSceneLoaded;
-        
-        
+
+        QRCodeScanner.QRCodeRead += ConnectToServer;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -49,10 +53,10 @@ public class ClientBehaviour : MonoBehaviour
         m_Driver.EndSend(writer);
     }
 
-    public void ConnectToServer()
+    void ConnectToServer(string ip)
     {
         //var endpoint = NetworkEndpoint.LoopbackIpv4.WithPort(7777);
-        var endpoint = NetworkEndpoint.Parse(m_ip, 7777,NetworkFamily.Ipv4);
+        var endpoint = NetworkEndpoint.Parse(ip, 7777,NetworkFamily.Ipv4);
 
         m_Connection = m_Driver.Connect(endpoint);
     }
@@ -92,6 +96,7 @@ public class ClientBehaviour : MonoBehaviour
             {
                 Debug.Log("Client got disconnected from server.");
                 m_Connection = default;
+                messageReceived?.Invoke("MobileJoin");
             }
         }
 

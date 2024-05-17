@@ -2,12 +2,14 @@ using UnityEngine;
 using Unity.Collections;
 using Unity.Networking.Transport;
 using System.Net;
+using System;
 
 public class ServerBehaviour : MonoBehaviour
 {
 
     NetworkDriver m_Driver;
     NativeList<NetworkConnection> m_Connections;
+    public static Action<Player> PlayerConnected;
 
     public void StartServer()
     {
@@ -84,9 +86,41 @@ public class ServerBehaviour : MonoBehaviour
             {
                 if (cmd == NetworkEvent.Type.Data)
                 {
-                    //uint number = stream.ReadUInt();
-                    FixedString32Bytes name = stream.ReadFixedString32();
-                    Debug.Log($"{name} has connected.");
+                    byte messageType = stream.ReadByte();
+
+                    switch(messageType)
+                    {
+                        //Client connection
+                        case 1:
+                            Debug.Log("Client has connected");
+                            if(stream.ReadByte() != 0)
+                            {
+                                Player newPlayer = new Player();
+                                newPlayer.name = stream.ReadFixedString32();
+                                newPlayer.score = 0;
+                                PlayerConnected?.Invoke(newPlayer);
+                            }
+                            else
+                            {
+                                Debug.Log("Client disocnnected");
+                            }
+                            
+                            break;
+
+                        //Load scene
+                        case 2:
+                            Debug.LogError("Cannot load scene on a server, this message should be for clients.");
+                            break;
+
+                        //Client answer
+                        case 3:
+                            Debug.Log("Client has answered");
+                            break;
+                        //Message not recognised, throw error and ignore
+                        default:
+                            Debug.LogError(String.Format("Message type ({0}) not recognised, it has been ignored.", messageType));
+                            break;
+                    }
 
                 }
                 else if (cmd == NetworkEvent.Type.Disconnect)

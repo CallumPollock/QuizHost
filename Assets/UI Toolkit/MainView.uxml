@@ -2,6 +2,7 @@
     <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; background-color: rgba(245, 126, 126, 0);">
         <ui:VisualElement style="flex-grow: 1; flex-direction: row; height: 350px;">
             <ui:ListView focusable="true" name="ConnectedPlayers" style="width: 230px; margin-right: 6px; background-color: rgba(168, 72, 72, 0);" />
+            <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
