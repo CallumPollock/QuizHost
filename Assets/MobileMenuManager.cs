@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using TMPro;
 using UnityEngine;
 
 public class MobileMenuManager : MonoBehaviour
@@ -7,10 +7,20 @@ public class MobileMenuManager : MonoBehaviour
     [SerializeField] GameObject chooseConnectionMethod;
     [SerializeField] GameObject phoneQRCamera;
     [SerializeField] GameObject ipSubmission;
+    [SerializeField] GameObject nameEntry;
+    [SerializeField] TextMeshProUGUI serverInfoTMP;
 
     private void Start()
     {
         NavigateMenu(0);
+        ClientBehaviour.ServerInfo += UpdateConnectedServerInfo;
+    }
+
+    void UpdateConnectedServerInfo(string serverInfo)
+    {
+        NavigateMenu(3);
+        serverInfoTMP.text = String.Format("Connected to host:\n{0}", serverInfo);
+        
     }
 
     public void NavigateMenu(int menu)
@@ -18,9 +28,10 @@ public class MobileMenuManager : MonoBehaviour
         chooseConnectionMethod.SetActive(false);
         phoneQRCamera.SetActive(false);
         ipSubmission.SetActive(false);
+        nameEntry.SetActive(false);
 
         switch(menu)
-        {//0 = main; 1 = qr code; 2 = manual
+        {//0 = main; 1 = qr code; 2 = manual; 3 = name selection
             case 0:
                 chooseConnectionMethod.SetActive(true);
                 break;
@@ -29,6 +40,9 @@ public class MobileMenuManager : MonoBehaviour
                 break;
             case 2:
                 ipSubmission.SetActive(true);
+                break;
+            case 3:
+                nameEntry.SetActive(true);
                 break;
             default:
                 Debug.LogError("No such menu exists");

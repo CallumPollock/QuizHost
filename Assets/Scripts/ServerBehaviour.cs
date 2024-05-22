@@ -3,13 +3,22 @@ using Unity.Collections;
 using Unity.Networking.Transport;
 using System.Net;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine.UI;
 
 public class ServerBehaviour : MonoBehaviour
 {
 
     NetworkDriver m_Driver;
     NativeList<NetworkConnection> m_Connections;
-    public static Action<Player> PlayerConnected;
+    //public static Action<Player> PlayerConnected;
+    public static Action<Player[]> UpdatePlayerList;
+
+    private Dictionary<NetworkConnection, Player> m_Players = new Dictionary<NetworkConnection, Player>();
+
+    [SerializeField] Slider m_timerValue;
 
     public void StartServer()
     {
@@ -39,6 +48,11 @@ public class ServerBehaviour : MonoBehaviour
     public void SendClientsToScene(string scene)
     {
         SendMessageToAllClients(new Net_LoadSceneMessage((Scenes)Enum.Parse(typeof(Scenes), scene)));
+    }
+
+    public void StartTimer()
+    {
+        SendMessageToAllClients(new Net_StartTimer((int)m_timerValue.value));
     }
 
     void SendMessageToAllClients(NetworkMessage _msg)
@@ -80,7 +94,7 @@ public class ServerBehaviour : MonoBehaviour
         {
             m_Connections.Add(c);
             Debug.Log("Accepted a connection.");
-            MessageClient(c, new Net_LoadSceneMessage(Scenes.Lobby));
+            
         }
 
         for (int i = 0; i < m_Connections.Length; i++)
@@ -91,19 +105,17 @@ public class ServerBehaviour : MonoBehaviour
             {
                 if (cmd == NetworkEvent.Type.Data)
                 {
-                    byte messageType = stream.ReadByte();
+                    MessageType messageType = (MessageType)Enum.Parse(typeof(MessageType), stream.ReadByte().ToString());
 
                     switch(messageType)
                     {
                         //Client connection
-                        case 1:
-                            Debug.Log("Client has connected");
+                        case MessageType.ClientConnection:
+                            
                             if(stream.ReadByte() != 0)
                             {
-                                Player newPlayer = new Player();
-                                newPlayer.name = stream.ReadFixedString32();
-                                newPlayer.score = 0;
-                                PlayerConnected?.Invoke(newPlayer);
+                                Debug.Log("Client has connected");
+                                MessageClient(m_Connections[i], new Net_ServerInfo(Dns.GetHostName()));
                             }
                             else
                             {
@@ -112,17 +124,34 @@ public class ServerBehaviour : MonoBehaviour
                             
                             break;
 
+                        //Client join session
+                        case MessageType.JoinSession:
+                            if (stream.ReadByte() != 0)
+                            {
+                                Player newPlayer = new Player(stream.ReadFixedString32());
+                                //PlayerConnected?.Invoke(newPlayer);
+                                m_Players.Add(m_Connections[i], newPlayer);
+                                UpdatePlayerList?.Invoke(m_Players.Values.ToArray());
+                                MessageClient(m_Connections[i], new Net_LoadSceneMessage(Scenes.Lobby));
+                            }
+                            else
+                            {
+                                Debug.Log("Client disocnnected");
+                            }
+                            break;
+
                         //Load scene
-                        case 2:
+                        case MessageType.LoadScene:
                             Debug.LogError("Cannot load scene on a server, this message should be for clients.");
                             break;
 
                         //Client answer
-                        case 3:
+                        case MessageType.ClientAnswer:
                             Byte ans = stream.ReadByte();
                             Debug.Log(String.Format("Client has answered with {0}", ans));
                             MessageClient(m_Connections[i], new Net_CharAnswer((char)ans));
                             break;
+
                         //Message not recognised, throw error and ignore
                         default:
                             Debug.LogError(String.Format("Message type ({0}) not recognised, it has been ignored.", messageType));

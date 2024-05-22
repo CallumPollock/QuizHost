@@ -20,7 +20,7 @@ public class Net_LoadSceneMessage : NetworkMessage
 
     public override void Serialize(ref DataStreamWriter writer)
     {
-        writer.WriteByte((byte)Type);
+        base.Serialize(ref writer);
         writer.WriteByte((byte)scene);
     }
 }

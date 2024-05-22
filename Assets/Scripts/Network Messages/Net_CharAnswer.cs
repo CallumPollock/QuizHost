@@ -12,7 +12,7 @@ public class Net_CharAnswer : Net_Answer
 
     public override void Serialize(ref DataStreamWriter writer)
     {
-        writer.WriteByte((byte)Type);
+        base.Serialize(ref writer);
         writer.WriteByte((byte)answer);
     }
 

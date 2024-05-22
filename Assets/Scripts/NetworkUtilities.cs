@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 public static partial class NetworkUtilities
 {
@@ -28,7 +29,7 @@ public static partial class NetworkUtilities
         }
         catch (HttpRequestException ex)
         {
-            // Handle exception
+            Debug.WriteLine(ex);
         }
 
         return urlContent;

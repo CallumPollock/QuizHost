@@ -9,16 +9,18 @@ public class ClientBehaviour : MonoBehaviour
     NetworkDriver m_Driver;
     NetworkConnection m_Connection;
 
-    Player player;
+    String playerName;
 
     string m_ip = "127.0.0.1";
     public static Action<Scenes> LoadScene;
+    public static Action<String> ServerInfo;
+    public static Action<int> StartTimer;
 
     KeyboardHandler m_KeyboardHandler;
 
     public void UpdateName(string _name)
     {
-        player.name = _name;
+        playerName = _name;
     }
     public void UpdateIP(string _ip)
     {
@@ -29,6 +31,10 @@ public class ClientBehaviour : MonoBehaviour
         ConnectToServer(m_ip);
     }
 
+    public void JoinSession()
+    {
+        SendMessageToServer(new Net_JoinSession(true, playerName));
+    }
 
     void Start()
     {
@@ -88,30 +94,33 @@ public class ClientBehaviour : MonoBehaviour
             {
                 Debug.Log("We are now connected to the server.");
 
-                Net_ClientConnection clientConnection = new Net_ClientConnection(true, player);
+                Net_ClientConnection clientConnection = new Net_ClientConnection(true);
                 SendMessageToServer(clientConnection);
             }
             else if (cmd == NetworkEvent.Type.Data)
             {
-                byte messageType = stream.ReadByte();
+                MessageType messageType = (MessageType)Enum.Parse(typeof(MessageType), stream.ReadByte().ToString());
 
                 switch (messageType)
                 {
-                    //Client connection
-                    case 1:
-                        Debug.LogError("This message is for the server, client will ignore it.");
-                        break;
-
                     //Load scene
-                    case 2:
+                    case MessageType.LoadScene:
                         LoadScene?.Invoke((Scenes)stream.ReadByte());
                         break;
 
                     //Client answer
-                    case 3:
+                    case MessageType.ClientAnswer:
                         Byte ans = stream.ReadByte();
                         Debug.Log(String.Format("Server has confirmed answer with {0}", ans));
                         m_KeyboardHandler.ConfirmAnswer(ans);
+                        break;
+
+                    case MessageType.ServerInfo:
+                        ServerInfo?.Invoke(stream.ReadFixedString32().ToString());
+                        break;
+
+                    case MessageType.StartTimer:
+                        StartTimer?.Invoke(stream.ReadInt());
                         break;
                     //Message not recognised, throw error and ignore
                     default:
