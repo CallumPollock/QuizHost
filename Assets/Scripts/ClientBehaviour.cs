@@ -15,6 +15,7 @@ public class ClientBehaviour : MonoBehaviour
     public static Action<Scenes> LoadScene;
     public static Action<String> ServerInfo;
     public static Action<int> StartTimer;
+    public static Action<String> RevealQuestion;
 
     KeyboardHandler m_KeyboardHandler;
 
@@ -121,6 +122,10 @@ public class ClientBehaviour : MonoBehaviour
 
                     case MessageType.StartTimer:
                         StartTimer?.Invoke(stream.ReadInt());
+                        break;
+
+                    case MessageType.RevealQuestion:
+                        RevealQuestion?.Invoke(String.Format("{0}\n{1}", stream.ReadFixedString128(), stream.ReadFixedString64()));
                         break;
                     //Message not recognised, throw error and ignore
                     default:

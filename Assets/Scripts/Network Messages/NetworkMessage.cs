@@ -9,6 +9,7 @@ public enum MessageType
     JoinSession = 4,
     ServerInfo = 5,
     StartTimer = 6,
+    RevealQuestion = 7,
 }
 
 public abstract class NetworkMessage 

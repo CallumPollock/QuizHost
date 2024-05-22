@@ -30,6 +30,7 @@ public class Timer : MonoBehaviour
         m_maxTime = seconds;
         m_clock.fillAmount = 1;
         m_time = (float)seconds;
+        countdown.Stop();
     }
 
     private void Update()
@@ -49,7 +50,7 @@ public class Timer : MonoBehaviour
 
         m_time = Mathf.Max(0f, m_time-Time.deltaTime);
         m_timerText.text = m_time.ToString("0");
-        m_clock.fillAmount = 1f - ((m_maxTime / m_time)/10f);
+        m_clock.fillAmount = 1f / ((m_maxTime / m_time)/10f);
     }
 
 }

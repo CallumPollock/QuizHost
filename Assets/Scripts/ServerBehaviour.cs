@@ -18,7 +18,10 @@ public class ServerBehaviour : MonoBehaviour
 
     private Dictionary<NetworkConnection, Player> m_Players = new Dictionary<NetworkConnection, Player>();
 
+    private Dictionary<Player, Byte> m_playerAnswers = new Dictionary<Player, byte>();
+
     [SerializeField] Slider m_timerValue;
+    [SerializeField] TMP_Text m_questionText, m_answerText;
 
     public void StartServer()
     {
@@ -70,6 +73,34 @@ public class ServerBehaviour : MonoBehaviour
         m_Driver.BeginSend(client, out writer);
         _msg.Serialize(ref writer);
         m_Driver.EndSend(writer);
+    }
+
+    public void RevealQuestion()
+    {
+        SendMessageToAllClients(new Net_RevealQuestion(m_questionText.text, ""));
+    }
+
+    public void RevealAnswer()
+    {
+        SendMessageToAllClients(new Net_RevealQuestion(m_questionText.text, "Answer: " +m_answerText.text));
+
+        CheckAnswers(((byte)m_answerText.text.ToCharArray()[0]));
+    }
+
+    private void CheckAnswers(byte _answer)
+    {
+        foreach(KeyValuePair<Player, byte> _playerAnswer in  m_playerAnswers)
+        {
+            Debug.Log(String.Format("{0} answered {1}, the correct answer was {2}", _playerAnswer.Key.name, (char)_playerAnswer.Value, (char)_answer));
+
+            if(_playerAnswer.Value == _answer)
+            {
+                _playerAnswer.Key.score += 1;
+            }
+            
+        }
+        m_playerAnswers.Clear();
+        UpdatePlayerList?.Invoke(m_Players.Values.ToArray());
     }
 
     void Update()
@@ -150,6 +181,7 @@ public class ServerBehaviour : MonoBehaviour
                             Byte ans = stream.ReadByte();
                             Debug.Log(String.Format("Client has answered with {0}", ans));
                             MessageClient(m_Connections[i], new Net_CharAnswer((char)ans));
+                            m_playerAnswers.Add(m_Players[m_Connections[i]], ans);
                             break;
 
                         //Message not recognised, throw error and ignore

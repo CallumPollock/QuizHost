@@ -343,6 +343,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_timerValue: {fileID: 391939927}
+  m_questionText: {fileID: 2096428075}
+  m_answerText: {fileID: 2130897696}
 --- !u!4 &69367917
 Transform:
   m_ObjectHideFlags: 0
@@ -1899,7 +1901,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 540585505}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 69367916}
+        m_TargetAssemblyTypeName: ServerBehaviour, Assembly-CSharp
+        m_MethodName: RevealQuestion
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &540585505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3726,7 +3740,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1199803395}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 69367916}
+        m_TargetAssemblyTypeName: ServerBehaviour, Assembly-CSharp
+        m_MethodName: RevealAnswer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1199803395
 MonoBehaviour:
   m_ObjectHideFlags: 0
