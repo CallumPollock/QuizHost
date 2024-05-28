@@ -96,11 +96,13 @@ public class ServerBehaviour : MonoBehaviour
             if(_playerAnswer.Value == _answer)
             {
                 _playerAnswer.Key.score += 1;
+                MessageClient(_playerAnswer.Key.connection, new Net_PlayerScore(_playerAnswer.Key.score));
             }
             
         }
         m_playerAnswers.Clear();
         UpdatePlayerList?.Invoke(m_Players.Values.ToArray());
+        
     }
 
     void Update()
@@ -130,6 +132,13 @@ public class ServerBehaviour : MonoBehaviour
 
         for (int i = 0; i < m_Connections.Length; i++)
         {
+            string _playerName = "Client";
+
+            if(m_Players.TryGetValue(m_Connections[i], out Player player))
+            {
+                _playerName = player.name.ToString();
+            }
+
             DataStreamReader stream;
             NetworkEvent.Type cmd;
             while ((cmd = m_Driver.PopEventForConnection(m_Connections[i], out stream)) != NetworkEvent.Type.Empty)
@@ -145,21 +154,21 @@ public class ServerBehaviour : MonoBehaviour
                             
                             if(stream.ReadByte() != 0)
                             {
-                                Debug.Log("Client has connected");
+                                Debug.Log(_playerName + " has connected awaiting name");
                                 MessageClient(m_Connections[i], new Net_ServerInfo(Dns.GetHostName()));
                             }
                             else
                             {
-                                Debug.Log("Client disocnnected");
+                                Debug.Log(_playerName + " disocnnected");
                             }
                             
                             break;
 
                         //Client join session
                         case MessageType.JoinSession:
-                            if (stream.ReadByte() != 0)
+                            if (stream.ReadByte() == 1)
                             {
-                                Player newPlayer = new Player(stream.ReadFixedString32());
+                                Player newPlayer = new Player(stream.ReadFixedString32(), m_Connections[i]);
                                 //PlayerConnected?.Invoke(newPlayer);
                                 m_Players.Add(m_Connections[i], newPlayer);
                                 UpdatePlayerList?.Invoke(m_Players.Values.ToArray());
@@ -167,7 +176,7 @@ public class ServerBehaviour : MonoBehaviour
                             }
                             else
                             {
-                                Debug.Log("Client disocnnected");
+                                Debug.Log(_playerName + " disocnnected");
                                 m_Players.Remove(m_Connections[i]);
                                 UpdatePlayerList?.Invoke(m_Players.Values.ToArray());
                             }
@@ -175,14 +184,15 @@ public class ServerBehaviour : MonoBehaviour
 
                         //Load scene
                         case MessageType.LoadScene:
-                            Debug.LogError("Cannot load scene on a server, this message should be for clients.");
+                            Debug.Log(String.Format("Confirmed {0} is in scene: {1}", _playerName, stream.ReadByte()));
+                            MessageClient(m_Connections[i], new Net_JoinSession(true, _playerName));
                             break;
 
                         //Client answer
                         case MessageType.ClientAnswer:
                             Byte ans = stream.ReadByte();
-                            Debug.Log(String.Format("Client has answered with {0}", ans));
-                            MessageClient(m_Connections[i], new Net_CharAnswer((char)ans));
+                            Debug.Log(String.Format(m_Players[m_Connections[i]].name + " has answered with {0}", (char)ans));
+                            MessageClient(m_Connections[i], new Net_SingleByteAnswer(ans));
                             m_playerAnswers.Add(m_Players[m_Connections[i]], ans);
                             break;
 
@@ -195,7 +205,7 @@ public class ServerBehaviour : MonoBehaviour
                 }
                 else if (cmd == NetworkEvent.Type.Disconnect)
                 {
-                    Debug.Log("Client disconnected from the server.");
+                    Debug.Log(_playerName + " disconnected from the server.");
                     m_Connections[i] = default;
                     break;
                 }

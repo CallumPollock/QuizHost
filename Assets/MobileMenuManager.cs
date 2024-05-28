@@ -9,11 +9,22 @@ public class MobileMenuManager : MonoBehaviour
     [SerializeField] GameObject ipSubmission;
     [SerializeField] GameObject nameEntry;
     [SerializeField] TextMeshProUGUI serverInfoTMP;
+    [SerializeField] TMP_Text nameTextField;
 
     private void Start()
     {
         NavigateMenu(0);
         ClientBehaviour.ServerInfo += UpdateConnectedServerInfo;
+
+        if(PlayerPrefs.HasKey("PlayerName"))
+        {
+            nameTextField.text = PlayerPrefs.GetString("PlayerName");
+        }
+    }
+
+    public void UpdateNamePlayerPref(string name)
+    {
+        PlayerPrefs.SetString("PlayerName", name);
     }
 
     void UpdateConnectedServerInfo(string serverInfo)

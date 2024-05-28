@@ -10,7 +10,7 @@ public class KeyboardHandler : MonoBehaviour
     [SerializeField] Transform m_gridTransorm;
     [SerializeField] GameObject m_keyPrefab;
 
-    public Action<Net_CharAnswer> OnKeyPress;
+    public Action<Net_SingleByteAnswer> OnKeyPress;
 
 
     private Dictionary<int, Button> m_keys = new Dictionary<int, Button>();
@@ -18,13 +18,15 @@ public class KeyboardHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SetUpKeyboard();
+        SetUpKeyboard(true, 26, 65);
+
+        //SetUpKeyboard(true, 10, 48);
     }
 
-    void SetUpKeyboard()
+    void SetUpKeyboard(bool isLetters, int amountOfKeys, int offset)
     {
         m_keys.Clear();
-        for(int i = 65; i < 91; i++)
+        for(int i = offset; i < amountOfKeys + offset; i++)
         {
             Char c = Convert.ToChar(i);
 
@@ -38,9 +40,7 @@ public class KeyboardHandler : MonoBehaviour
 
     void CreateAnswerMessageAndSend(char c)
     {
-        Net_CharAnswer message = new Net_CharAnswer(c);
-        OnKeyPress(message);
-
+        OnKeyPress(new Net_SingleByteAnswer((byte)c));
     }
     
     public void ConfirmAnswer(Byte answer)

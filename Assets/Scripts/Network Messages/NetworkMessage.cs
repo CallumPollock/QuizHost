@@ -10,6 +10,7 @@ public enum MessageType
     ServerInfo = 5,
     StartTimer = 6,
     RevealQuestion = 7,
+    PlayerScore = 8,
 }
 
 public abstract class NetworkMessage 

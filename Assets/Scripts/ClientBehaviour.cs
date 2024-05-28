@@ -17,6 +17,8 @@ public class ClientBehaviour : MonoBehaviour
     public static Action<String> ServerInfo;
     public static Action<int> StartTimer;
     public static Action<String> RevealQuestion;
+    public static Action<int> UpdatePlayerScore;
+    public static Action<string> UpdateTeamName;
 
     KeyboardHandler m_KeyboardHandler;
 
@@ -45,6 +47,7 @@ public class ClientBehaviour : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         QRCodeScanner.QRCodeRead += ConnectToServer;
+
     }
 
     void CreateAnswerMessage(byte[] ans_bytes)
@@ -56,6 +59,8 @@ public class ClientBehaviour : MonoBehaviour
     {
         m_KeyboardHandler = FindAnyObjectByType<KeyboardHandler>();
         m_KeyboardHandler.OnKeyPress += SendMessageToServer;
+
+        SendMessageToServer(new Net_LoadSceneMessage((Scenes)scene.buildIndex));
     }
 
     public void SendMessageToServer(NetworkMessage netMsg)
@@ -141,6 +146,16 @@ public class ClientBehaviour : MonoBehaviour
                     case MessageType.RevealQuestion:
                         RevealQuestion?.Invoke(String.Format("{0}\n{1}", stream.ReadFixedString128(), stream.ReadFixedString64()));
                         break;
+
+                    case MessageType.PlayerScore:
+                        UpdatePlayerScore?.Invoke(stream.ReadInt());
+                        break;
+
+                    case MessageType.JoinSession:
+                        if (stream.ReadByte() == 1)
+                            UpdateTeamName?.Invoke(stream.ReadFixedString32().ToString());
+                        break;
+
                     //Message not recognised, throw error and ignore
                     default:
                         Debug.LogError(String.Format("Message type ({0}) not recognised, it has been ignored.", messageType));

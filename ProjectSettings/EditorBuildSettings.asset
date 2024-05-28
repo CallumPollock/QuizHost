@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/PC Host.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
     path: Assets/Scenes/MobileJoin.unity
@@ -18,3 +18,4 @@ EditorBuildSettings:
     path: Assets/Scenes/Keypad.unity
     guid: cee275b57ec0fb7499a1e1693e8336bd
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
