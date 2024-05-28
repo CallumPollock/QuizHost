@@ -3,6 +3,7 @@ using Unity.Networking.Transport;
 using Unity.Collections;
 using System;
 using UnityEngine.SceneManagement;
+using Unity.Networking.Transport.Error;
 
 public class ClientBehaviour : MonoBehaviour
 {
@@ -78,6 +79,15 @@ public class ClientBehaviour : MonoBehaviour
         m_Driver.Dispose();
     }
 
+    void OnDisconnect(DisconnectReason disconnectReason)
+    {
+        Debug.Log("Disconnected with reason: " + disconnectReason.ToString());
+        SendMessageToServer(new Net_ClientConnection(false, (byte)disconnectReason));
+        m_Connection = default;
+        LoadScene?.Invoke(0);
+        Destroy(gameObject);
+    }
+
     void Update()
     {
         m_Driver.ScheduleUpdate().Complete();
@@ -87,6 +97,12 @@ public class ClientBehaviour : MonoBehaviour
             return;
         }
 
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            m_Connection.Disconnect(m_Driver);
+            Debug.Log("Disconnected");
+        }
+
         Unity.Collections.DataStreamReader stream;
         NetworkEvent.Type cmd;
         while ((cmd = m_Connection.PopEvent(m_Driver, out stream)) != NetworkEvent.Type.Empty)
@@ -94,9 +110,7 @@ public class ClientBehaviour : MonoBehaviour
             if (cmd == NetworkEvent.Type.Connect)
             {
                 Debug.Log("We are now connected to the server.");
-
-                Net_ClientConnection clientConnection = new Net_ClientConnection(true);
-                SendMessageToServer(clientConnection);
+                SendMessageToServer(new Net_ClientConnection(true, 0));
             }
             else if (cmd == NetworkEvent.Type.Data)
             {
@@ -136,9 +150,7 @@ public class ClientBehaviour : MonoBehaviour
             }
             else if (cmd == NetworkEvent.Type.Disconnect)
             {
-                Debug.Log("Client got disconnected from server.");
-                m_Connection = default;
-                LoadScene?.Invoke(0);
+                OnDisconnect((DisconnectReason)stream.ReadByte());
             }
         }
 

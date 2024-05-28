@@ -168,6 +168,8 @@ public class ServerBehaviour : MonoBehaviour
                             else
                             {
                                 Debug.Log("Client disocnnected");
+                                m_Players.Remove(m_Connections[i]);
+                                UpdatePlayerList?.Invoke(m_Players.Values.ToArray());
                             }
                             break;
 
